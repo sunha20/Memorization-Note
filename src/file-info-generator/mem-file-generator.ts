@@ -104,7 +104,7 @@ export class MemFileGenerator {
 			footNoteContents += `\n[^${footNoteIdx}]: ${answer.replace(/\n/g, "/")}`;
 
 			// 본문은 빈칸과 각주 번호로 치환
-			const result = `{  |[^${footNoteIdx}]}`;
+			const result = `{  :[^${footNoteIdx}]}`;
 			footNoteIdx += 1;
 
 			return result;
