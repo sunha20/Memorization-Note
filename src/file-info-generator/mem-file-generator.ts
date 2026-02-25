@@ -91,34 +91,24 @@ export class MemFileGenerator {
 	}
 
 	private setBlankContents() {
-		const contents = this.file.contents.split("");
-		let flag = false;
+		// const contents = this.file.contents.split("");
 		let footNoteContents = "\n\n---\n";
 		let footNoteIdx = 1;
-		for (let i = 0; i < contents.length; i++) {
-			if (contents[i] == this.blankMark[1] && flag) { // blank end
-				flag = false;
-				contents[i] = `|[^${footNoteIdx}]${this.blankMark[1]}`;
-				footNoteContents += "\n";
-				footNoteIdx += 1;
-				continue;
-			}
 
-			if (contents[i] == this.blankMark[0]) { // blank start
-				flag = true;
-				footNoteContents += `[^${footNoteIdx}]: `
-				continue;
-			}
+		const processedContents = this.file.contents.replace(this.blankReg, (match) => {
+			// match에는 "<u>정답</u>" 전체가 들어옴
+			// 여기서 앞뒤 마크를 떼고 정답만 추출
+			const answer = match.slice(this.blankMark[0].length, -this.blankMark[1].length);
 
-			if (flag) {
-				if (contents[i] == "\n") {
-					footNoteContents += "/";
-				} else {
-					footNoteContents += contents[i];
-					contents[i] = "  ";
-				}
-			}
-		}
-		return contents.join("") + footNoteContents;
+			// 각주 생성
+			footNoteContents += `\n[^${footNoteIdx}]: ${answer.replace(/\n/g, "/")}`;
+
+			// 본문은 빈칸과 각주 번호로 치환
+			const result = `{  |[^${footNoteIdx}]}`;
+			footNoteIdx += 1;
+
+			return result;
+		});
+		return processedContents + footNoteContents;
 	}
 }
